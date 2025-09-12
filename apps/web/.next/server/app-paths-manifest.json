@@ -8,6 +8,10 @@
   "/proveedor/page": "app/proveedor/page.js",
   "/proveedor/rfqs/page": "app/proveedor/rfqs/page.js",
   "/site/[orgSlug]/[slug]/page": "app/site/[orgSlug]/[slug]/page.js",
+  "/workshop/base-de-datos/proveedores/page": "app/workshop/base-de-datos/proveedores/page.js",
+  "/workshop/comunicacion/whatsapp-ia/page": "app/workshop/comunicacion/whatsapp-ia/page.js",
+  "/workshop/operaciones/rfq/page": "app/workshop/operaciones/rfq/page.js",
   "/workshop/page": "app/workshop/page.js",
+  "/workshop/propuestas/nueva/page": "app/workshop/propuestas/nueva/page.js",
   "/workshop/rfq/new/page": "app/workshop/rfq/new/page.js"
 }

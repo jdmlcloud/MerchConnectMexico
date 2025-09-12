@@ -1,7 +1,10 @@
+"use client"
+
 import { DashboardLayout } from "../../src/components/dashboard/layout"
 import { Card, CardContent, CardHeader, CardTitle } from "../../src/components/ui/card"
 import { Button } from "../../src/components/ui/button"
 import { Badge } from "../../src/components/ui/badge"
+import { useFeatureFlags } from "../../src/hooks/use-feature-flags"
 import { 
   Package, 
   FileText, 
@@ -10,8 +13,56 @@ import {
   Plus,
   Search,
   Filter,
-  Download
+  Download,
+  LayoutDashboard,
+  Factory,
+  Boxes,
+  Image,
+  ClipboardList,
+  PlusSquare,
+  FileSpreadsheet,
+  PackageSearch,
+  CheckSquare,
+  MessagesSquare,
+  FileSignature,
+  Sparkles,
+  PenTool,
+  FileDown,
+  BarChart3,
+  FileBarChart,
+  Truck,
+  Globe,
+  Palette,
+  UserCog,
+  BadgeCheck,
+  Settings2
 } from "lucide-react"
+
+const iconMap: Record<string, any> = {
+  LayoutDashboard,
+  Factory,
+  Boxes,
+  Image,
+  Users,
+  ClipboardList,
+  PlusSquare,
+  FileSpreadsheet,
+  PackageSearch,
+  CheckSquare,
+  MessagesSquare,
+  FileSignature,
+  Sparkles,
+  PenTool,
+  FileDown,
+  BarChart3,
+  FileBarChart,
+  Truck,
+  Globe,
+  Palette,
+  UserCog,
+  BadgeCheck,
+  Settings2
+}
 
 const workshopStats = [
   {
@@ -44,61 +95,21 @@ const workshopStats = [
   },
 ]
 
-const recentRfqs = [
-  {
-    id: "RFQ-001",
-    title: "Cascos de Seguridad Industrial",
-    quantity: 500,
-    status: "active",
-    responses: 8,
-    created: "2 horas ago",
-  },
-  {
-    id: "RFQ-002", 
-    title: "Uniformes de Trabajo",
-    quantity: 200,
-    status: "quoted",
-    responses: 12,
-    created: "1 día ago",
-  },
-  {
-    id: "RFQ-003",
-    title: "Herramientas Eléctricas",
-    quantity: 100,
-    status: "completed",
-    responses: 15,
-    created: "3 días ago",
-  },
-]
-
-const quickActions = [
-  {
-    title: "Nuevo RFQ",
-    description: "Crear una nueva solicitud de cotización",
-    icon: Plus,
-    href: "/workshop/rfq/new",
-  },
-  {
-    title: "Ver Cotizaciones",
-    description: "Revisar propuestas recibidas",
-    icon: FileText,
-    href: "/workshop/quotes",
-  },
-  {
-    title: "Gestionar Órdenes",
-    description: "Seguimiento de órdenes activas",
-    icon: Package,
-    href: "/workshop/orders",
-  },
-  {
-    title: "Proveedores",
-    description: "Explorar proveedores disponibles",
-    icon: Users,
-    href: "/workshop/suppliers",
-  },
-]
-
 export default function WorkshopPage() {
+  const { getFilteredWorkshopNavigation, loading } = useFeatureFlags()
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-lg">Cargando...</div>
+        </div>
+      </DashboardLayout>
+    )
+  }
+
+  const navigation = getFilteredWorkshopNavigation()
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -148,75 +159,61 @@ export default function WorkshopPage() {
           })}
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* RFQs Recientes */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>RFQs Recientes</CardTitle>
-                <Button variant="outline" size="sm">
-                  Ver todos
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {recentRfqs.map((rfq) => (
-                  <div key={rfq.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2">
-                        <h4 className="font-medium">{rfq.title}</h4>
-                        <Badge 
-                          variant={rfq.status === "active" ? "default" : 
-                                  rfq.status === "quoted" ? "secondary" : "outline"}
-                        >
-                          {rfq.status}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-gray-500">
-                        Cantidad: {rfq.quantity} unidades • {rfq.responses} respuestas
-                      </p>
-                      <p className="text-xs text-gray-400">{rfq.created}</p>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      Ver
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Acciones Rápidas */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Acciones Rápidas</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-3">
-                {quickActions.map((action) => {
-                  const Icon = action.icon
-                  return (
-                    <Button
-                      key={action.title}
-                      variant="outline"
-                      className="h-auto p-4 justify-start"
-                      asChild
-                    >
-                      <a href={action.href}>
-                        <Icon className="mr-3 h-5 w-5" />
-                        <div className="text-left">
-                          <div className="font-medium">{action.title}</div>
-                          <div className="text-sm text-gray-500">{action.description}</div>
-                        </div>
-                      </a>
-                    </Button>
-                  )
-                })}
-              </div>
-            </CardContent>
-          </Card>
+        {/* Navegación del Workshop */}
+        <div className="grid gap-6">
+          {navigation.map((group) => (
+            <Card key={group.group}>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-800">
+                  {group.group}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                  {group.items.map((item) => {
+                    const Icon = iconMap[item.icon]
+                    return (
+                      <Button
+                        key={item.path}
+                        variant="outline"
+                        className="h-auto p-4 justify-start"
+                        asChild
+                      >
+                        <a href={item.path}>
+                          <Icon className="mr-3 h-5 w-5" />
+                          <div className="text-left">
+                            <div className="font-medium">{item.label}</div>
+                            {item.feature && (
+                              <Badge variant="secondary" className="text-xs mt-1">
+                                Feature
+                              </Badge>
+                            )}
+                            {item.perm && (
+                              <Badge variant="outline" className="text-xs mt-1">
+                                {item.perm}
+                              </Badge>
+                            )}
+                          </div>
+                        </a>
+                      </Button>
+                    )
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
+
+        {/* Información sobre features */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Funcionalidades Disponibles</CardTitle>
+            <p className="text-sm text-gray-600">
+              Las funcionalidades mostradas arriba están controladas por el administrador del sistema. 
+              Contacta con tu administrador si necesitas acceso a funcionalidades adicionales.
+            </p>
+          </CardHeader>
+        </Card>
       </div>
     </DashboardLayout>
   )
