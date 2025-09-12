@@ -1,13 +1,10 @@
 import { Stack, StackProps, CfnOutput, Tags } from 'aws-cdk-lib';
-import { Pipeline, Artifact } from 'aws-cdk-lib/aws-codepipeline';
-import { CodeStarConnectionsSourceAction, CodeBuildAction } from 'aws-cdk-lib/aws-codepipeline-actions';
 import { Project, BuildSpec, LinuxBuildImage, ComputeType } from 'aws-cdk-lib/aws-codebuild';
 import { Role, ServicePrincipal, PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam';
 import { IBucket } from 'aws-cdk-lib/aws-s3';
-import { CloudFrontWebDistribution } from 'aws-cdk-lib/aws-cloudfront';
 import { Construct } from 'constructs';
 
-export interface CicdCompleteStackProps extends StackProps {
+export interface CicdSimpleStackProps extends StackProps {
   stage: 'dev' | 'sbx' | 'prod';
   githubOwner: string;
   githubRepo: string;
@@ -15,15 +12,12 @@ export interface CicdCompleteStackProps extends StackProps {
   githubConnectionArn: string;
   artifactsBucket: IBucket;
   webBucket: IBucket;
-  webDistribution: CloudFrontWebDistribution;
-  apiDistribution: CloudFrontWebDistribution;
 }
 
-export class CicdCompleteStack extends Stack {
-  public readonly pipeline: Pipeline;
+export class CicdSimpleStack extends Stack {
   public readonly buildProject: Project;
 
-  constructor(scope: Construct, id: string, props: CicdCompleteStackProps) {
+  constructor(scope: Construct, id: string, props: CicdSimpleStackProps) {
     super(scope, id, props);
 
     const { 
@@ -33,9 +27,7 @@ export class CicdCompleteStack extends Stack {
       githubBranch, 
       githubConnectionArn, 
       artifactsBucket,
-      webBucket,
-      webDistribution,
-      apiDistribution
+      webBucket
     } = props;
 
     // IAM Role para CodeBuild
@@ -76,16 +68,6 @@ export class CicdCompleteStack extends Stack {
     codeBuildRole.addToPolicy(new PolicyStatement({
       effect: Effect.ALLOW,
       actions: [
-        'cloudfront:CreateInvalidation',
-        'cloudfront:GetInvalidation',
-        'cloudfront:ListInvalidations',
-      ],
-      resources: ['*'],
-    }));
-
-    codeBuildRole.addToPolicy(new PolicyStatement({
-      effect: Effect.ALLOW,
-      actions: [
         'logs:CreateLogGroup',
         'logs:CreateLogStream',
         'logs:PutLogEvents',
@@ -108,8 +90,6 @@ export class CicdCompleteStack extends Stack {
           NEXT_PUBLIC_DOMAIN: { value: `${stage}.merchconnectmexico.com` },
           NEXT_PUBLIC_API_URL: { value: `https://api-${stage}.merchconnectmexico.com/v1` },
           WEB_BUCKET_NAME: { value: webBucket.bucketName },
-          WEB_DISTRIBUTION_ID: { value: 'placeholder' },
-          API_DISTRIBUTION_ID: { value: 'placeholder' },
         },
       },
       buildSpec: BuildSpec.fromObject({
@@ -138,25 +118,10 @@ export class CicdCompleteStack extends Stack {
           },
           post_build: {
             commands: [
-              // Deploy Lambda functions
-              'for func_name in $(aws lambda list-functions --query "Functions[?contains(FunctionName, `mc-${STAGE}-`)].FunctionName" --output text); do',
-              '  echo "Updating Lambda function: $func_name"',
-              '  SERVICE_NAME=$(echo $func_name | sed "s/mc-${STAGE}-//")',
-              '  SERVICE_PATH="apps/services/${SERVICE_NAME%%-*}"',
-              '  if [ -d "$SERVICE_PATH" ]; then',
-              '    cd $SERVICE_PATH',
-              '    zip -r function.zip .',
-              '    aws lambda update-function-code --function-name $func_name --zip-file fileb://function.zip',
-              '    cd ../../..',
-              '  fi',
-              'done',
               // Deploy static assets to S3
               'aws s3 sync apps/web/.next/static s3://$WEB_BUCKET_NAME/static/ --delete --cache-control "public, max-age=31536000, immutable"',
               'aws s3 sync apps/web/public s3://$WEB_BUCKET_NAME/ --delete --cache-control "public, max-age=31536000"',
               'aws s3 cp apps/web/.next/standalone/ s3://$WEB_BUCKET_NAME/ --recursive --cache-control "public, max-age=31536000"',
-              // Invalidate CloudFront distributions
-              'aws cloudfront create-invalidation --distribution-id $WEB_DISTRIBUTION_ID --paths "/*"',
-              'aws cloudfront create-invalidation --distribution-id $API_DISTRIBUTION_ID --paths "/*"',
             ],
           },
         },
@@ -170,26 +135,15 @@ export class CicdCompleteStack extends Stack {
       }),
     });
 
-    // CodePipeline - Simplificado
-    this.pipeline = new Pipeline(this, 'Pipeline', {
-      pipelineName: `merchconnect-${stage}-pipeline`,
-      artifactBucket: artifactsBucket,
-    });
-
     // Outputs
-    new CfnOutput(this, 'PipelineName', {
-      value: this.pipeline.pipelineName,
-      description: 'CodePipeline Name',
-    });
-
-    new CfnOutput(this, 'PipelineArn', {
-      value: this.pipeline.pipelineArn,
-      description: 'CodePipeline ARN',
-    });
-
     new CfnOutput(this, 'BuildProjectName', {
       value: this.buildProject.projectName,
       description: 'CodeBuild Project Name',
+    });
+
+    new CfnOutput(this, 'BuildProjectArn', {
+      value: this.buildProject.projectArn,
+      description: 'CodeBuild Project ARN',
     });
 
     // Tags

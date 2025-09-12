@@ -8,7 +8,7 @@ import { DomainStack } from './domain-stack';
 import { CloudFrontSimpleStack } from './cloudfront-simple-stack';
 import { WafStack } from './waf-stack';
 import { MonitoringStack } from './monitoring-stack';
-import { CicdCompleteStack } from './cicd-complete-stack';
+import { CicdSimpleStack } from './cicd-simple-stack';
 
 export interface MerchConnectStackProps extends cdk.StackProps {
   stage: Stage;
@@ -26,7 +26,7 @@ export class MerchConnectStack extends cdk.Stack {
   // public readonly cloudFrontStack: CloudFrontSimpleStack;
   // public readonly wafStack: WafStack;
   // public readonly monitoringStack: MonitoringStack;
-  // public readonly cicdStack: CicdCompleteStack;
+  public readonly cicdStack: CicdSimpleStack;
 
   constructor(scope: Construct, id: string, props: MerchConnectStackProps) {
     super(scope, id, props);
@@ -78,18 +78,16 @@ export class MerchConnectStack extends cdk.Stack {
     //   alarmEmail,
     // });
 
-    // CI/CD Stack - Temporalmente deshabilitado
-    // this.cicdStack = new CicdCompleteStack(this, 'CicdStack', {
-    //   stage,
-    //   githubOwner,
-    //   githubRepo,
-    //   githubBranch,
-    //   githubConnectionArn,
-    //   artifactsBucket,
-    //   webBucket: this.importStack.assetsBucket,
-    //   webDistribution: this.cloudFrontStack.webDistribution,
-    //   apiDistribution: this.cloudFrontStack.apiDistribution,
-    // });
+    // CI/CD Stack
+    this.cicdStack = new CicdSimpleStack(this, 'CicdStack', {
+      stage,
+      githubOwner,
+      githubRepo,
+      githubBranch,
+      githubConnectionArn,
+      artifactsBucket,
+      webBucket: this.importStack.assetsBucket,
+    });
 
     // Outputs
     new cdk.CfnOutput(this, 'ArtifactsBucketName', {
