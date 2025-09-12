@@ -30,9 +30,10 @@ jobs:
         uses: pnpm/action-setup@v2
         with:
           version: 8
+          run_install: false
 
-      - name: Ensure pnpm is globally available
-        run: npm install -g pnpm
+      - name: Verify pnpm
+        run: pnpm -v
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -69,9 +70,10 @@ jobs:
         uses: pnpm/action-setup@v2
         with:
           version: 8
+          run_install: false
 
-      - name: Ensure pnpm is globally available
-        run: npm install -g pnpm
+      - name: Verify pnpm
+        run: pnpm -v
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -126,18 +128,19 @@ jobs:
         uses: pnpm/action-setup@v2
         with:
           version: 8
+          run_install: false
 
-      - name: Ensure pnpm is globally available
-        run: npm install -g pnpm
+      - name: Verify pnpm
+        run: pnpm -v
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Deploy infrastructure
+      - name: Deploy infrastructure (CDK)
         run: |
           cd infra/cdk
           pnpm build
-          cdk deploy --all --require-approval never
+          npx cdk deploy --all --require-approval never
         env:
           CDK_DEFAULT_REGION: us-east-1
           CDK_DEFAULT_ACCOUNT: 209350187548
@@ -188,7 +191,7 @@ jobs:
             --query "DistributionList.Items[?Comment=='MerchConnect sbx - CloudFront Distribution'].Id" \
             --output text)
           aws cloudfront create-invalidation \
-            --distribution-id $DISTRIBUTION_ID \
+            --distribution-id "$DISTRIBUTION_ID" \
             --paths "/*"
 
   notify:
