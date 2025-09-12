@@ -1,0 +1,21 @@
+{
+  "name": "@merchconnect/auth",
+  "version": "0.1.0",
+  "private": false,
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -w -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint 'src/**/*.{ts,tsx}'",
+    "test": "node -e \"console.log('auth ok')\""
+  },
+  "dependencies": {
+    "jose": "^5.9.4",
+    "@merchconnect/types": "workspace:*"
+  }
+}

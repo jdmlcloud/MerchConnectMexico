@@ -1,0 +1,22 @@
+# node
+node_modules
+.pnpm-store
+
+# builds
+.dist
+/build
+/dist
+/.turbo
+/.next
+/coverage
+
+# env
+.env
+.env.local
+.env*.local
+
+# os
+.DS_Store
+
+# cdk
+cdk.out

@@ -1,0 +1,4 @@
+
+> @merchconnect/types@0.1.0 build /Volumes/Macintosh HD/MerchConnectMexico/packages/types
+> tsc -p tsconfig.json
+

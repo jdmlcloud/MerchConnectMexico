@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --mc-white: #ffffff;
+  --mc-deep-navy: #00043c;
+  --mc-gray-100: #e6e6e6;
+  --mc-navy: #00076f;
+  --mc-near-black: #000109;
+}
+
+html { color-scheme: light dark; }
+body { @apply bg-mc-white text-mc-near-black dark:bg-mc-near-black dark:text-mc-gray-100; }

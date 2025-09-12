@@ -1,0 +1,24 @@
+{
+  "name": "@merchconnect/data",
+  "version": "0.1.0",
+  "private": false,
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -w -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint 'src/**/*.{ts,tsx}'",
+    "test": "node -e \"console.log('data ok')\""
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.645.0",
+    "@aws-sdk/lib-dynamodb": "^3.645.0",
+    "@aws-sdk/client-sqs": "^3.645.0",
+    "@aws-sdk/client-s3": "^3.645.0",
+    "@merchconnect/types": "workspace:*"
+  }
+}

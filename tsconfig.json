@@ -1,0 +1,10 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/types" },
+    { "path": "./packages/features" },
+    { "path": "./packages/data" },
+    { "path": "./packages/storage" },
+    { "path": "./packages/auth" }
+  ]
+}

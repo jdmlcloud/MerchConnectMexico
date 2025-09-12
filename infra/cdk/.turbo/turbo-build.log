@@ -1,0 +1,4 @@
+
+> @merchconnect/infra-cdk@0.1.0 build /Volumes/Macintosh HD/MerchConnectMexico/infra/cdk
+> tsc -p tsconfig.json
+
