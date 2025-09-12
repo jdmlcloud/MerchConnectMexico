@@ -19,11 +19,7 @@ export const authOptions: NextAuthOptions = {
           return {
             id: '1',
             email: 'admin@merchconnect.com',
-            name: 'Admin User',
-            role: 'admin',
-            orgId: 'admin-org',
-            orgType: 'admin',
-            plan: 'enterprise'
+            name: 'Admin User'
           }
         }
 
@@ -37,19 +33,13 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = user.role
-        token.orgId = user.orgId
-        token.orgType = user.orgType
-        token.plan = user.plan
+        token.id = user.id
       }
       return token
     },
     async session({ session, token }) {
       if (token) {
-        session.user.role = token.role
-        session.user.orgId = token.orgId
-        session.user.orgType = token.orgType
-        session.user.plan = token.plan
+        session.user.id = token.id as string
       }
       return session
     }
