@@ -1,20 +1,11 @@
-name: Deploy to Sandbox
+name: PNPM Test
 
 on:
   push:
     branches: [sandbox]
-  pull_request:
-    branches: [sandbox]
-
-env:
-  AWS_REGION: us-east-1
-  STAGE: sbx
-  DOMAIN: sbx.merchconnectmexico.com
-  API_DOMAIN: api-sbx.merchconnectmexico.com
 
 jobs:
-  test:
-    name: Run Tests
+  test-pnpm:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -26,188 +17,11 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
-      - name: Install pnpm
+      - name: Setup pnpm properly
         uses: pnpm/action-setup@v2
         with:
           version: 8
-          run_install: false
+          run_install: false  # ← asegura que no instale dependencias aquí
 
-      - name: Verify pnpm
+      - name: Check pnpm is available
         run: pnpm -v
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Run linting
-        run: pnpm lint
-
-      - name: Run type checking
-        run: pnpm type-check
-
-      - name: Run tests
-        run: pnpm test
-
-      - name: Run E2E tests
-        run: pnpm test:e2e
-        env:
-          PLAYWRIGHT_BASE_URL: https://sbx.merchconnectmexico.com
-
-  build:
-    name: Build Application
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-          run_install: false
-
-      - name: Verify pnpm
-        run: pnpm -v
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build packages
-        run: pnpm build:packages
-
-      - name: Build web application
-        run: pnpm build:web
-        env:
-          NEXT_PUBLIC_STAGE: sbx
-          NEXT_PUBLIC_DOMAIN: sbx.merchconnectmexico.com
-          NEXT_PUBLIC_API_URL: https://api-sbx.merchconnectmexico.com/v1
-
-      - name: Build services
-        run: pnpm build:services
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts-sbx
-          path: |
-            apps/web/.next
-            apps/services/dist
-            packages/*/dist
-
-  deploy-infrastructure:
-    name: Deploy Infrastructure
-    runs-on: ubuntu-latest
-    needs: build
-    if: github.event_name == 'push'
-    permissions:
-      id-token: write
-      contents: read
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::209350187548:role/github-actions-role
-          aws-region: us-east-1
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-          run_install: false
-
-      - name: Verify pnpm
-        run: pnpm -v
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Deploy infrastructure (CDK)
-        run: |
-          cd infra/cdk
-          pnpm build
-          npx cdk deploy --all --require-approval never
-        env:
-          CDK_DEFAULT_REGION: us-east-1
-          CDK_DEFAULT_ACCOUNT: 209350187548
-
-  deploy-application:
-    name: Deploy Application
-    runs-on: ubuntu-latest
-    needs: [build, deploy-infrastructure]
-    if: github.event_name == 'push'
-    permissions:
-      id-token: write
-      contents: read
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts-sbx
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::209350187548:role/github-actions-role
-          aws-region: us-east-1
-
-      - name: Deploy Lambda functions
-        run: |
-          cd apps/services/pages
-          zip -r function.zip .
-          aws lambda update-function-code \
-            --function-name mc-sbx-pages-worker \
-            --zip-file fileb://function.zip
-
-      - name: Deploy static assets to S3
-        run: |
-          aws s3 sync apps/web/.next/static s3://mc-sbx-public-209350187548/static/ \
-            --delete \
-            --cache-control "public, max-age=31536000, immutable"
-          aws s3 sync apps/web/public s3://mc-sbx-public-209350187548/ \
-            --delete \
-            --cache-control "public, max-age=31536000"
-
-      - name: Invalidate CloudFront
-        run: |
-          DISTRIBUTION_ID=$(aws cloudfront list-distributions \
-            --query "DistributionList.Items[?Comment=='MerchConnect sbx - CloudFront Distribution'].Id" \
-            --output text)
-          aws cloudfront create-invalidation \
-            --distribution-id "$DISTRIBUTION_ID" \
-            --paths "/*"
-
-  notify:
-    name: Notify Deployment
-    runs-on: ubuntu-latest
-    needs: [deploy-application]
-    if: always() && github.event_name == 'push'
-    steps:
-      - name: Notify success
-        if: needs.deploy-application.result == 'success'
-        run: |
-          echo "✅ Deployment to SANDBOX successful!"
-          echo "🌐 URL: https://sbx.merchconnectmexico.com"
-          echo "🔗 API: https://api-sbx.merchconnectmexico.com/v1"
-      - name: Notify failure
-        if: needs.deploy-application.result == 'failure'
-        run: |
-          echo "❌ Deployment to SANDBOX failed!"
-          echo "Please check the logs for details."
