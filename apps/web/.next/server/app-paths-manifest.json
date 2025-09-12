@@ -4,8 +4,8 @@
   "/admin/page": "app/admin/page.js",
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/api/v1/pages/[orgId]/[slug]/publish/route": "app/api/v1/pages/[orgId]/[slug]/publish/route.js",
-  "/page": "app/page.js",
   "/proveedor/page": "app/proveedor/page.js",
+  "/page": "app/page.js",
   "/site/[orgSlug]/[slug]/page": "app/site/[orgSlug]/[slug]/page.js",
   "/workshop/page": "app/workshop/page.js"
 }
