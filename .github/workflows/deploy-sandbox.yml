@@ -29,7 +29,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 9.6.0
 
       - name: Cache pnpm store
         uses: actions/cache@v4
@@ -39,6 +39,20 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+
+      - name: Verify pnpm-lock.yaml
+        run: |
+          echo "Checking for pnpm-lock.yaml..."
+          ls -la | grep pnpm
+          if [ -f pnpm-lock.yaml ]; then
+            echo "✅ pnpm-lock.yaml found"
+            echo "File size: $(wc -c < pnpm-lock.yaml) bytes"
+            echo "First few lines:"
+            head -5 pnpm-lock.yaml
+          else
+            echo "❌ pnpm-lock.yaml not found"
+            exit 1
+          fi
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
