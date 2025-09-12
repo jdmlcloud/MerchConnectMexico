@@ -1,4 +1,7 @@
-import NextAuth from 'next-auth';
-import { authOptions } from '@/lib/auth';
+export async function GET() {
+  return new Response('Auth endpoint', { status: 200 })
+}
 
-export const { GET, POST } = NextAuth(authOptions);
+export async function POST() {
+  return new Response('Auth endpoint', { status: 200 })
+}

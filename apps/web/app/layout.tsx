@@ -1,22 +1,20 @@
-import '@/styles/globals.css';
-import { ReactNode } from 'react';
-import { Providers } from '@/components/providers';
+import type { Metadata } from 'next'
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'MerchConnect México',
-  description: 'Marketplace B2B multi-tenant de talleres y proveedores de merchandise',
-};
+  description: 'Marketplace B2B para talleres y proveedores de merchandise',
+}
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html lang="es" suppressHydrationWarning>
-      <body>
-        <Providers>
-          <div className="min-h-screen">
-            {children}
-          </div>
-        </Providers>
+    <html lang="es">
+      <body className="antialiased">
+        {children}
       </body>
     </html>
-  );
+  )
 }
