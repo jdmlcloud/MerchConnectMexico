@@ -21,4 +21,5 @@ export const PaginationSchema = z.object({
     limit: z.number().int().positive().max(100).default(20),
     cursor: z.string().optional()
 });
+export * from './features.js';
 export * as zod from 'zod';

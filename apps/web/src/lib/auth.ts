@@ -1,29 +1,53 @@
 import NextAuth, { type NextAuthOptions } from 'next-auth';
 import CognitoProvider from 'next-auth/providers/cognito';
-import { getEnv } from '@/lib/env';
+import Credentials from 'next-auth/providers/credentials';
+
+const stage = (process.env.NEXT_PUBLIC_STAGE as 'dev' | 'sbx' | 'prod') || 'dev';
 
 export const authOptions: NextAuthOptions = {
   providers: [
+    ...(stage === 'dev'
+      ? [
+          Credentials({
+            name: 'Dev Login',
+            credentials: {
+              email: { label: 'Email', type: 'email' },
+              orgId: { label: 'OrgId', type: 'text' },
+              orgType: { label: 'OrgType', type: 'text', value: 'provider' },
+            },
+            async authorize(credentials) {
+              const email = credentials?.email as string;
+              const orgId = (credentials?.orgId as string) || 'demo-org';
+              const orgType = (credentials?.orgType as string) || 'provider';
+              if (!email) return null;
+              return {
+                id: email,
+                email,
+                name: email.split('@')[0],
+                orgId,
+                orgType,
+              } as any;
+            },
+          }),
+        ]
+      : []),
     CognitoProvider({
-      clientId: process.env.COGNITO_CLIENT_ID!,
+      clientId: process.env.COGNITO_CLIENT_ID || 'missing',
       clientSecret: '',
-      issuer: `https://cognito-idp.${process.env.AWS_REGION ?? 'us-east-1'}.amazonaws.com/${process.env.COGNITO_USER_POOL_ID}`,
+      issuer: `https://cognito-idp.${process.env.AWS_REGION ?? 'us-east-1'}.amazonaws.com/${process.env.COGNITO_USER_POOL_ID || 'missing'}`,
       checks: ['pkce', 'state'],
     }),
   ],
   session: { strategy: 'jwt' },
   callbacks: {
-    async jwt({ token, account, profile }) {
-      // Attach custom claims from token if present or keep existing
-      const stage = process.env.NEXT_PUBLIC_STAGE as 'dev' | 'sbx' | 'prod';
+    async jwt({ token, account, user }) {
       token.stage = stage;
-      // NOTE: In a real flow, map orgId, orgType, plan, roles from your DB or IdP custom claims
-      token.orgId = token.orgId ?? 'demo-org';
-      token.orgType = token.orgType ?? 'provider';
-      token.plan = token.plan ?? 'pro';
-      token.features = token.features ?? [];
-      token.roles = token.roles ?? ['admin'];
-      token.perms = token.perms ?? ['*'];
+      token.orgId = (token.orgId as string) || (user as any)?.orgId || 'demo-org';
+      token.orgType = (token.orgType as string) || (user as any)?.orgType || 'provider';
+      token.plan = token.plan || 'pro';
+      token.features = token.features || [];
+      token.roles = token.roles || ['admin'];
+      token.perms = token.perms || ['*'];
       return token as any;
     },
     async session({ session, token }) {
@@ -39,7 +63,7 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || 'dev-secret-only',
 };
 
 export const { auth } = NextAuth(authOptions);

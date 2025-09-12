@@ -39,12 +39,22 @@ export class AsyncStack extends Stack {
       bundling: {
         platform: 'node',
         target: 'node20',
-        externalModules: [],
+        externalModules: ['@aws-sdk/*'],
+        commandHooks: {
+          beforeBundling: (inputDir: string, outputDir: string): string[] => {
+            return [];
+          },
+          beforeInstall: (inputDir: string, outputDir: string): string[] => {
+            return [];
+          },
+          afterBundling: (inputDir: string, outputDir: string): string[] => {
+            return [];
+          },
+        },
       },
       environment: {
         STAGE: props.stage,
         AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
-        AWS_REGION: this.region,
       },
     });
     worker.addEventSource(new SqsEventSource(pagesQueue, { batchSize: 5 }));

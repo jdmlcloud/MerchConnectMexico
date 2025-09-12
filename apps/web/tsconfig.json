@@ -18,6 +18,12 @@
       ],
       "@/styles/*": [
         "./src/styles/*"
+      ],
+      "@merchconnect/types": [
+        "../../packages/types/src"
+      ],
+      "@merchconnect/features": [
+        "../../packages/features/src"
       ]
     },
     "types": [

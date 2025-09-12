@@ -34,4 +34,6 @@ export const PaginationSchema = z.object({
 });
 export type Pagination = z.infer<typeof PaginationSchema>;
 
+export * from './features.js';
+
 export * as zod from 'zod';

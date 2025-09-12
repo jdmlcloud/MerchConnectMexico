@@ -17,7 +17,7 @@ export declare const AuthClaimsSchema: z.ZodObject<{
     stage: "dev" | "sbx" | "prod";
     orgId: string;
     orgType: "workshop" | "provider";
-    plan: "free" | "pro" | "premium";
+    plan: "premium" | "pro" | "free";
     features: string[];
     roles: string[];
     perms: string[];
@@ -25,7 +25,7 @@ export declare const AuthClaimsSchema: z.ZodObject<{
     stage: "dev" | "sbx" | "prod";
     orgId: string;
     orgType: "workshop" | "provider";
-    plan: "free" | "pro" | "premium";
+    plan: "premium" | "pro" | "free";
     features?: string[] | undefined;
     roles?: string[] | undefined;
     perms?: string[] | undefined;
@@ -44,4 +44,5 @@ export declare const PaginationSchema: z.ZodObject<{
     cursor?: string | undefined;
 }>;
 export type Pagination = z.infer<typeof PaginationSchema>;
+export * from './features.js';
 export * as zod from 'zod';

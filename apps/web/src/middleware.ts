@@ -1,14 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export function middleware(req: NextRequest) {
-  const url = new URL(req.url);
-  const stage = process.env.NEXT_PUBLIC_STAGE;
-  // Basic CORS/runtime stage guard: SSR-safe
-  if (stage === 'dev' && url.hostname.includes('sbx')) return new NextResponse('Forbidden', { status: 403 });
-  if (stage === 'sbx' && url.hostname.includes('dev')) return new NextResponse('Forbidden', { status: 403 });
-  return NextResponse.next();
+export function middleware(request: NextRequest) {
+  // Headers de seguridad básicos
+  const response = NextResponse.next();
+  
+  // Aplicar headers de seguridad
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('X-XSS-Protection', '1; mode=block');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  
+  return response;
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/workshop/:path*', '/proveedor/:path*'],
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico).*)',
+  ],
 };

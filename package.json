@@ -18,7 +18,9 @@
     "deploy:infra:sbx": "cd infra/cdk && STAGE=sbx cdk deploy --all --require-approval never",
     "deploy:infra:prod": "cd infra/cdk && STAGE=prod cdk deploy --all --require-approval never",
     "synth:infra": "cd infra/cdk && cdk synth",
-    "seed:dev": "tsx scripts/seed-dev.ts"
+    "seed:dev": "tsx scripts/seeds-dev.ts",
+    "aws:setup": "./scripts/aws-setup.sh",
+    "deploy": "./scripts/deploy.sh"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.8",
