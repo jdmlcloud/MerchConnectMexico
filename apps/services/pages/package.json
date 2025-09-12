@@ -5,7 +5,9 @@
   "type": "module",
   "main": "dist/handler.js",
   "types": "dist/handler.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -w -p tsconfig.json",
@@ -14,8 +16,9 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.645.0",
     "@merchconnect/storage": "workspace:*",
+    "@merchconnect/svc-common": "workspace:*",
     "@merchconnect/types": "workspace:*",
-    "@merchconnect/svc-common": "workspace:*"
+    "esbuild": "^0.25.9"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.145",

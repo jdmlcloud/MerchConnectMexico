@@ -32,12 +32,22 @@ class AsyncStack extends aws_cdk_lib_1.Stack {
             bundling: {
                 platform: 'node',
                 target: 'node20',
-                externalModules: [],
+                externalModules: ['@aws-sdk/*'],
+                commandHooks: {
+                    beforeBundling: (inputDir, outputDir) => {
+                        return [];
+                    },
+                    beforeInstall: (inputDir, outputDir) => {
+                        return [];
+                    },
+                    afterBundling: (inputDir, outputDir) => {
+                        return [];
+                    },
+                },
             },
             environment: {
                 STAGE: props.stage,
                 AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
-                AWS_REGION: this.region,
             },
         });
         worker.addEventSource(new aws_lambda_event_sources_1.SqsEventSource(pagesQueue, { batchSize: 5 }));
