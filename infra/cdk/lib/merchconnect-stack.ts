@@ -1,6 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
+import { Stage } from '@merchconnect/types';
 import { DataStack } from './data-stack';
 import { IdentityStack } from './identity-stack';
 import { ApiStack } from './api-stack';
@@ -9,11 +10,11 @@ import { WebStack } from './web-stack';
 import { CicdStack } from './cicd-stack';
 
 export interface MerchConnectStackProps extends cdk.StackProps {
-  stage: string;
+  stage: Stage;
   githubOwner: string;
   githubRepo: string;
   githubBranch: string;
-  githubTokenSecretArn: string;
+  githubConnectionArn: string;
 }
 
 export class MerchConnectStack extends cdk.Stack {
@@ -27,7 +28,7 @@ export class MerchConnectStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: MerchConnectStackProps) {
     super(scope, id, props);
 
-    const { stage, githubOwner, githubRepo, githubBranch, githubTokenSecretArn } = props;
+    const { stage, githubOwner, githubRepo, githubBranch, githubConnectionArn } = props;
 
     // Artifacts bucket for CI/CD
     const artifactsBucket = new s3.Bucket(this, 'ArtifactsBucket', {
@@ -48,23 +49,23 @@ export class MerchConnectStack extends cdk.Stack {
       stage,
     });
 
-    // API Stack
-    this.apiStack = new ApiStack(this, 'ApiStack', {
-      stage,
-      userPool: this.identityStack.userPool,
-      table: this.dataStack.table,
-    });
-
     // Async Stack
     this.asyncStack = new AsyncStack(this, 'AsyncStack', {
       stage,
-      table: this.dataStack.table,
+    });
+
+    // API Stack
+    this.apiStack = new ApiStack(this, 'ApiStack', {
+      stage,
+      dataTable: this.dataStack.table,
+      queue: this.asyncStack.pagesQueue,
+      userPool: this.identityStack.userPool,
     });
 
     // Web Stack
     this.webStack = new WebStack(this, 'WebStack', {
       stage,
-      apiUrl: this.apiStack.apiUrl,
+      distributionOrigins: [this.apiStack.httpApiUrl],
     });
 
     // CI/CD Stack
@@ -73,7 +74,7 @@ export class MerchConnectStack extends cdk.Stack {
       githubOwner,
       githubRepo,
       githubBranch,
-      githubTokenSecretArn,
+      githubConnectionArn,
       artifactsBucket,
     });
 

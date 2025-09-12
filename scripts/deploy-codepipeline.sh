@@ -1,12 +1,11 @@
 #!/bin/bash
 
 # Script para desplegar MerchConnect con CodePipeline
-# Uso: ./scripts/deploy-codepipeline.sh <stage> [github-token]
+# Uso: ./scripts/deploy-codepipeline.sh <stage>
 
 set -e
 
 STAGE=${1:-"dev"}
-GITHUB_TOKEN=${2:-""}
 REGION="us-east-1"
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 
@@ -18,19 +17,15 @@ if [[ ! "$STAGE" =~ ^(dev|sbx|prod)$ ]]; then
     exit 1
 fi
 
-# Configurar el token de GitHub si se proporciona
-if [ -n "$GITHUB_TOKEN" ]; then
-    echo "🔧 Configurando token de GitHub..."
-    ./scripts/setup-github-secret.sh "$GITHUB_TOKEN"
-fi
-
-# Verificar que el secret existe
-SECRET_ARN="arn:aws:secretsmanager:$REGION:$ACCOUNT_ID:secret:github-token"
-if ! aws secretsmanager describe-secret --secret-id "$SECRET_ARN" >/dev/null 2>&1; then
-    echo "❌ Error: El secret de GitHub no existe. Ejecuta:"
-    echo "   ./scripts/setup-github-secret.sh <tu_github_token>"
+# Verificar que la conexión de GitHub existe
+GITHUB_CONNECTION_ARN="arn:aws:codeconnections:$REGION:$ACCOUNT_ID:connection/dc84f0a6-30c7-4282-aa1d-25271ea24b7b"
+if ! aws codeconnections get-connection --connection-arn "$GITHUB_CONNECTION_ARN" >/dev/null 2>&1; then
+    echo "❌ Error: La conexión de GitHub no existe o no está disponible"
+    echo "   Configura primero la conexión en AWS CodeConnections"
     exit 1
 fi
+
+echo "✅ Conexión de GitHub verificada"
 
 echo "📦 Instalando dependencias..."
 pnpm install
@@ -45,7 +40,7 @@ cd infra/cdk
 export STAGE="$STAGE"
 export CDK_DEFAULT_ACCOUNT="$ACCOUNT_ID"
 export CDK_DEFAULT_REGION="$REGION"
-export GITHUB_TOKEN_SECRET_ARN="$SECRET_ARN"
+export GITHUB_CONNECTION_ARN="$GITHUB_CONNECTION_ARN"
 
 # Desplegar
 pnpm build

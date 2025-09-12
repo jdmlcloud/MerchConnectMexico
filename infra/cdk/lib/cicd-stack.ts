@@ -12,7 +12,7 @@ export interface CicdStackProps extends cdk.StackProps {
   githubOwner: string;
   githubRepo: string;
   githubBranch: string;
-  githubTokenSecretArn: string;
+  githubConnectionArn: string;
   artifactsBucket: s3.IBucket;
 }
 
@@ -23,7 +23,7 @@ export class CicdStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: CicdStackProps) {
     super(scope, id, props);
 
-    const { stage, githubOwner, githubRepo, githubBranch, githubTokenSecretArn, artifactsBucket } = props;
+    const { stage, githubOwner, githubRepo, githubBranch, githubConnectionArn, artifactsBucket } = props;
 
     // CodeBuild Project
     this.buildProject = new codebuild.Project(this, 'BuildProject', {
@@ -153,14 +153,14 @@ export class CicdStack extends cdk.Stack {
         {
           stageName: 'Source',
           actions: [
-            new codepipeline_actions.GitHubSourceAction({
+            new codepipeline_actions.CodeStarConnectionsSourceAction({
               actionName: 'GitHub_Source',
               owner: githubOwner,
               repo: githubRepo,
               branch: githubBranch,
-              oauthToken: cdk.SecretValue.secretsManager(githubTokenSecretArn),
+              connectionArn: githubConnectionArn,
               output: new codepipeline.Artifact('SourceOutput'),
-              trigger: codepipeline_actions.GitHubTrigger.WEBHOOK,
+              triggerOnPush: true,
             }),
           ],
         },

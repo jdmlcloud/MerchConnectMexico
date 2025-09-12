@@ -2,10 +2,18 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": ".",
+    "rootDir": "../../",
     "noEmit": false,
     "module": "CommonJS",
-    "moduleResolution": "Node"
+    "moduleResolution": "Node",
+    "baseUrl": "../../",
+    "paths": {
+      "@merchconnect/types": ["packages/types/src/index.ts"],
+      "@merchconnect/features": ["packages/features/src/index.ts"],
+      "@merchconnect/auth": ["packages/auth/src/index.ts"],
+      "@merchconnect/data": ["packages/data/src/index.ts"],
+      "@merchconnect/storage": ["packages/storage/src/index.ts"]
+    }
   },
-  "include": ["bin", "lib"]
+  "include": ["bin", "lib", "../../packages/types/src/**/*", "../../packages/features/src/**/*"]
 }

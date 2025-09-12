@@ -16,7 +16,7 @@ const region = process.env.CDK_DEFAULT_REGION || 'us-east-1';
 const githubOwner = process.env.GITHUB_OWNER || 'jdmlcloud';
 const githubRepo = process.env.GITHUB_REPO || 'MerchConnectMexico';
 const githubBranch = process.env.GITHUB_BRANCH || (stage === 'dev' ? 'develop' : stage === 'sbx' ? 'sandbox' : 'main');
-const githubTokenSecretArn = process.env.GITHUB_TOKEN_SECRET_ARN || 'arn:aws:secretsmanager:us-east-1:209350187548:secret:github-token';
+const githubConnectionArn = process.env.GITHUB_CONNECTION_ARN || 'arn:aws:codeconnections:us-east-1:209350187548:connection/dc84f0a6-30c7-4282-aa1d-25271ea24b7b';
 
 const app = new App();
 
@@ -37,5 +37,5 @@ new MerchConnectStack(app, `mc-${stage}`, {
   githubOwner,
   githubRepo,
   githubBranch,
-  githubTokenSecretArn,
+  githubConnectionArn,
 });
