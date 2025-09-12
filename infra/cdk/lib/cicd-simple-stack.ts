@@ -1,5 +1,5 @@
 import { Stack, StackProps, CfnOutput, Tags } from 'aws-cdk-lib';
-import { Project, BuildSpec, LinuxBuildImage, ComputeType } from 'aws-cdk-lib/aws-codebuild';
+import { Project, BuildSpec, LinuxBuildImage, ComputeType, Source } from 'aws-cdk-lib/aws-codebuild';
 import { Role, ServicePrincipal, PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam';
 import { IBucket } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
@@ -80,6 +80,11 @@ export class CicdSimpleStack extends Stack {
       projectName: `merchconnect-${stage}-build`,
       description: `MerchConnect ${stage} build project`,
       role: codeBuildRole,
+      source: Source.gitHub({
+        owner: githubOwner,
+        repo: githubRepo,
+        webhook: false,
+      }),
       environment: {
         buildImage: LinuxBuildImage.STANDARD_7_0,
         computeType: ComputeType.MEDIUM,
