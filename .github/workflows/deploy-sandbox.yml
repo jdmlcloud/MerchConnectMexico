@@ -29,16 +29,11 @@ jobs:
             pnpm-lock.yaml
             **/pnpm-lock.yaml
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 8
-          run_install: false
-
-      - name: Activate pnpm via corepack (belt & suspenders)
+      - name: Activate pnpm via Corepack
+        shell: bash
         run: |
           corepack enable
-          corepack prepare pnpm@8 --activate
+          corepack prepare pnpm@8.15.4 --activate
           which pnpm
           pnpm -v
 
@@ -76,16 +71,11 @@ jobs:
             pnpm-lock.yaml
             **/pnpm-lock.yaml
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 8
-          run_install: false
-
-      - name: Activate pnpm via corepack
+      - name: Activate pnpm via Corepack
+        shell: bash
         run: |
           corepack enable
-          corepack prepare pnpm@8 --activate
+          corepack prepare pnpm@8.15.4 --activate
           which pnpm
           pnpm -v
 
@@ -141,16 +131,11 @@ jobs:
             pnpm-lock.yaml
             **/pnpm-lock.yaml
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 8
-          run_install: false
-
-      - name: Activate pnpm via corepack
+      - name: Activate pnpm via Corepack
+        shell: bash
         run: |
           corepack enable
-          corepack prepare pnpm@8 --activate
+          corepack prepare pnpm@8.15.4 --activate
           which pnpm
           pnpm -v
 
