@@ -4,7 +4,11 @@ import { Construct } from 'constructs';
 import { Stage } from '@merchconnect/types';
 import { ImportStack } from './import-stack';
 import { WebStack } from './web-stack';
-import { CicdStack } from './cicd-stack';
+import { DomainStack } from './domain-stack';
+import { CloudFrontSimpleStack } from './cloudfront-simple-stack';
+import { WafStack } from './waf-stack';
+import { MonitoringStack } from './monitoring-stack';
+import { CicdCompleteStack } from './cicd-complete-stack';
 
 export interface MerchConnectStackProps extends cdk.StackProps {
   stage: Stage;
@@ -12,17 +16,22 @@ export interface MerchConnectStackProps extends cdk.StackProps {
   githubRepo: string;
   githubBranch: string;
   githubConnectionArn: string;
+  domainName: string;
+  alarmEmail: string;
 }
 
 export class MerchConnectStack extends cdk.Stack {
   public readonly importStack: ImportStack;
-  public readonly webStack: WebStack;
-  // public readonly cicdStack: CicdStack;
+  // public readonly domainStack: DomainStack;
+  // public readonly cloudFrontStack: CloudFrontSimpleStack;
+  // public readonly wafStack: WafStack;
+  // public readonly monitoringStack: MonitoringStack;
+  // public readonly cicdStack: CicdCompleteStack;
 
   constructor(scope: Construct, id: string, props: MerchConnectStackProps) {
     super(scope, id, props);
 
-    const { stage, githubOwner, githubRepo, githubBranch, githubConnectionArn } = props;
+    const { stage, githubOwner, githubRepo, githubBranch, githubConnectionArn, domainName, alarmEmail } = props;
 
     // Artifacts bucket for CI/CD
     const artifactsBucket = new s3.Bucket(this, 'ArtifactsBucket', {
@@ -38,20 +47,48 @@ export class MerchConnectStack extends cdk.Stack {
       stage,
     });
 
-    // Web Stack
-    this.webStack = new WebStack(this, 'WebStack', {
-      stage,
-      distributionOrigins: [`https://fawy9flh4m.execute-api.${this.region}.amazonaws.com`],
-    });
+    // Domain Stack - Temporalmente deshabilitado
+    // this.domainStack = new DomainStack(this, 'DomainStack', {
+    //   stage,
+    //   domainName,
+    // });
 
-    // CI/CD Stack - Temporalmente deshabilitado para evitar errores de región
-    // this.cicdStack = new CicdStack(this, 'CicdStack', {
+    // CloudFront Stack - Temporalmente deshabilitado
+    // this.cloudFrontStack = new CloudFrontSimpleStack(this, 'CloudFrontStack', {
+    //   stage,
+    //   webBucket: this.importStack.assetsBucket,
+    //   apiGateway: this.importStack.httpApi,
+    //   hostedZone: this.domainStack.hostedZone,
+    //   certificate: this.domainStack.certificate,
+    //   domainName,
+    // });
+
+    // WAF Stack - Temporalmente deshabilitado
+    // this.wafStack = new WafStack(this, 'WafStack', {
+    //   stage,
+    //   webDistribution: this.cloudFrontStack.webDistribution,
+    //   apiDistribution: this.cloudFrontStack.apiDistribution,
+    // });
+
+    // Monitoring Stack - Temporalmente deshabilitado
+    // this.monitoringStack = new MonitoringStack(this, 'MonitoringStack', {
+    //   stage,
+    //   webDistributionId: this.cloudFrontStack.webDistribution.distributionId,
+    //   apiDistributionId: this.cloudFrontStack.apiDistribution.distributionId,
+    //   alarmEmail,
+    // });
+
+    // CI/CD Stack - Temporalmente deshabilitado
+    // this.cicdStack = new CicdCompleteStack(this, 'CicdStack', {
     //   stage,
     //   githubOwner,
     //   githubRepo,
     //   githubBranch,
     //   githubConnectionArn,
     //   artifactsBucket,
+    //   webBucket: this.importStack.assetsBucket,
+    //   webDistribution: this.cloudFrontStack.webDistribution,
+    //   apiDistribution: this.cloudFrontStack.apiDistribution,
     // });
 
     // Outputs
