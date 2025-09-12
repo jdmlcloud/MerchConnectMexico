@@ -29,12 +29,9 @@ jobs:
             pnpm-lock.yaml
             **/pnpm-lock.yaml
 
-      - name: Activate pnpm via Corepack
-        shell: bash
+      - name: Install pnpm (global)
         run: |
-          corepack enable
-          corepack prepare pnpm@8.15.4 --activate
-          which pnpm
+          npm install -g pnpm
           pnpm -v
 
       - name: Install dependencies
@@ -71,12 +68,9 @@ jobs:
             pnpm-lock.yaml
             **/pnpm-lock.yaml
 
-      - name: Activate pnpm via Corepack
-        shell: bash
+      - name: Install pnpm (global)
         run: |
-          corepack enable
-          corepack prepare pnpm@8.15.4 --activate
-          which pnpm
+          npm install -g pnpm
           pnpm -v
 
       - name: Install dependencies
@@ -131,12 +125,9 @@ jobs:
             pnpm-lock.yaml
             **/pnpm-lock.yaml
 
-      - name: Activate pnpm via Corepack
-        shell: bash
+      - name: Install pnpm (global)
         run: |
-          corepack enable
-          corepack prepare pnpm@8.15.4 --activate
-          which pnpm
+          npm install -g pnpm
           pnpm -v
 
       - name: Install dependencies
