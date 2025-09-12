@@ -12,7 +12,7 @@ export class WebStack extends Stack {
 
     // Placeholder: In a full setup we could create Amplify app or CloudFront here.
     // For MVP infra wiring, just output intended API origin per stage.
-    new CfnOutput(this, 'ApiOrigin', { value: props.distributionOrigins.join(',') || 'n/a' });
+    new CfnOutput(this, 'ApiOrigin', { value: props.distributionOrigins?.join(',') || 'n/a' });
 
     Tags.of(this).add('Stage', props.stage);
   }
