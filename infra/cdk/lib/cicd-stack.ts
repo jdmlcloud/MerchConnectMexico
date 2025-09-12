@@ -148,9 +148,7 @@ export class CicdStack extends cdk.Stack {
     // CodePipeline
     this.pipeline = new codepipeline.Pipeline(this, 'Pipeline', {
       pipelineName: `merchconnect-${stage}-pipeline`,
-      crossRegionReplicationBuckets: {
-        [this.region]: artifactsBucket,
-      },
+      artifactBucket: artifactsBucket,
       stages: [
         {
           stageName: 'Source',

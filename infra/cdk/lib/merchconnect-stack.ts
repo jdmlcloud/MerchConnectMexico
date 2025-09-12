@@ -2,10 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import { Stage } from '@merchconnect/types';
-import { DataStack } from './data-stack';
-import { IdentityStack } from './identity-stack';
-import { ApiStack } from './api-stack';
-import { AsyncStack } from './async-stack';
+import { ImportStack } from './import-stack';
 import { WebStack } from './web-stack';
 import { CicdStack } from './cicd-stack';
 
@@ -18,12 +15,9 @@ export interface MerchConnectStackProps extends cdk.StackProps {
 }
 
 export class MerchConnectStack extends cdk.Stack {
-  public readonly dataStack: DataStack;
-  public readonly identityStack: IdentityStack;
-  public readonly apiStack: ApiStack;
-  public readonly asyncStack: AsyncStack;
+  public readonly importStack: ImportStack;
   public readonly webStack: WebStack;
-  public readonly cicdStack: CicdStack;
+  // public readonly cicdStack: CicdStack;
 
   constructor(scope: Construct, id: string, props: MerchConnectStackProps) {
     super(scope, id, props);
@@ -39,44 +33,26 @@ export class MerchConnectStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.RETAIN,
     });
 
-    // Data Stack
-    this.dataStack = new DataStack(this, 'DataStack', {
+    // Import existing resources
+    this.importStack = new ImportStack(this, 'ImportStack', {
       stage,
-    });
-
-    // Identity Stack
-    this.identityStack = new IdentityStack(this, 'IdentityStack', {
-      stage,
-    });
-
-    // Async Stack
-    this.asyncStack = new AsyncStack(this, 'AsyncStack', {
-      stage,
-    });
-
-    // API Stack
-    this.apiStack = new ApiStack(this, 'ApiStack', {
-      stage,
-      dataTable: this.dataStack.table,
-      queue: this.asyncStack.pagesQueue,
-      userPool: this.identityStack.userPool,
     });
 
     // Web Stack
     this.webStack = new WebStack(this, 'WebStack', {
       stage,
-      distributionOrigins: [this.apiStack.httpApiUrl],
+      distributionOrigins: [`https://fawy9flh4m.execute-api.${this.region}.amazonaws.com`],
     });
 
-    // CI/CD Stack
-    this.cicdStack = new CicdStack(this, 'CicdStack', {
-      stage,
-      githubOwner,
-      githubRepo,
-      githubBranch,
-      githubConnectionArn,
-      artifactsBucket,
-    });
+    // CI/CD Stack - Temporalmente deshabilitado para evitar errores de región
+    // this.cicdStack = new CicdStack(this, 'CicdStack', {
+    //   stage,
+    //   githubOwner,
+    //   githubRepo,
+    //   githubBranch,
+    //   githubConnectionArn,
+    //   artifactsBucket,
+    // });
 
     // Outputs
     new cdk.CfnOutput(this, 'ArtifactsBucketName', {
