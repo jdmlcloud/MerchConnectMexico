@@ -17,7 +17,7 @@ export declare const AuthClaimsSchema: z.ZodObject<{
     stage: "dev" | "sbx" | "prod";
     orgId: string;
     orgType: "workshop" | "provider";
-    plan: "premium" | "pro" | "free";
+    plan: "free" | "pro" | "premium";
     features: string[];
     roles: string[];
     perms: string[];
@@ -25,7 +25,7 @@ export declare const AuthClaimsSchema: z.ZodObject<{
     stage: "dev" | "sbx" | "prod";
     orgId: string;
     orgType: "workshop" | "provider";
-    plan: "premium" | "pro" | "free";
+    plan: "free" | "pro" | "premium";
     features?: string[] | undefined;
     roles?: string[] | undefined;
     perms?: string[] | undefined;
