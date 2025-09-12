@@ -1,0 +1,6 @@
+export { Sidebar } from './sidebar'
+export { Header } from './header'
+export { StatsCards } from './stats-cards'
+export { RecentActivity } from './recent-activity'
+export { QuickActions } from './quick-actions'
+export { DashboardLayout } from './layout'

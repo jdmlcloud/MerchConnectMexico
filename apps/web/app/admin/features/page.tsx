@@ -1,62 +1,98 @@
+import { DashboardLayout } from "../../../src/components/dashboard/layout"
+import { Card, CardContent, CardHeader, CardTitle } from "../../../src/components/ui/card"
+import { Button } from "../../../src/components/ui/button"
+import { Badge } from "../../../src/components/ui/badge"
+import { Switch } from "../../../src/components/ui/switch"
+
+const features = [
+  {
+    id: "proposal-generator",
+    name: "Proposal Generator",
+    description: "AI-powered tool to generate custom proposals for workshops",
+    enabled: true,
+    category: "AI Tools",
+  },
+  {
+    id: "advanced-analytics",
+    name: "Advanced Analytics",
+    description: "Detailed analytics and reporting for organizations",
+    enabled: false,
+    category: "Analytics",
+  },
+  {
+    id: "bulk-orders",
+    name: "Bulk Orders",
+    description: "Allow bulk ordering and inventory management",
+    enabled: true,
+    category: "Inventory",
+  },
+  {
+    id: "custom-branding",
+    name: "Custom Branding",
+    description: "Custom logos, colors, and branding for organizations",
+    enabled: false,
+    category: "Customization",
+  },
+  {
+    id: "api-access",
+    name: "API Access",
+    description: "REST API access for third-party integrations",
+    enabled: true,
+    category: "Integration",
+  },
+  {
+    id: "white-label",
+    name: "White Label",
+    description: "Complete white-label solution for enterprise clients",
+    enabled: false,
+    category: "Enterprise",
+  },
+]
+
 export default function FeaturesPage() {
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Gestión de Features</h1>
-          <p className="text-gray-600">Controla qué funcionalidades están disponibles para cada plan</p>
+    <DashboardLayout>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Feature Management</h1>
+            <p className="text-gray-600">Enable or disable features for different plans and organizations.</p>
+          </div>
+          <Button>Add New Feature</Button>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">Features Disponibles</h2>
-          <div className="space-y-4">
-            <div className="border border-gray-200 rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-medium">Generador de Propuestas</h3>
-                  <p className="text-sm text-gray-600">Permite crear propuestas automáticas</p>
+        <div className="grid gap-6">
+          {features.map((feature) => (
+            <Card key={feature.id}>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center space-x-2">
+                      <span>{feature.name}</span>
+                      <Badge variant="outline">{feature.category}</Badge>
+                    </CardTitle>
+                    <p className="text-sm text-gray-600 mt-1">{feature.description}</p>
+                  </div>
+                  <Switch checked={feature.enabled} />
                 </div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-500">Pro+</span>
-                  <button className="px-3 py-1 bg-green-100 text-green-800 rounded text-sm">
-                    Activo
-                  </button>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center space-x-4">
+                  <Button variant="outline" size="sm">
+                    Configure
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    View Usage
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    Edit
+                  </Button>
                 </div>
-              </div>
-            </div>
-
-            <div className="border border-gray-200 rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-medium">Analytics Avanzado</h3>
-                  <p className="text-sm text-gray-600">Reportes detallados y métricas</p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-500">Premium+</span>
-                  <button className="px-3 py-1 bg-green-100 text-green-800 rounded text-sm">
-                    Activo
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="border border-gray-200 rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-medium">Integración WhatsApp</h3>
-                  <p className="text-sm text-gray-600">Comunicación automática por WhatsApp</p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-500">Enterprise</span>
-                  <button className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded text-sm">
-                    Beta
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   )
 }
