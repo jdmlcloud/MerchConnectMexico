@@ -95,6 +95,7 @@ export class CicdSimpleStack extends Stack {
           NEXT_PUBLIC_DOMAIN: { value: `${stage}.merchconnectmexico.com` },
           NEXT_PUBLIC_API_URL: { value: `https://api-${stage}.merchconnectmexico.com/v1` },
           WEB_BUCKET_NAME: { value: webBucket.bucketName },
+          NODE_VERSION: { value: '20' },
         },
       },
       buildSpec: BuildSpec.fromObject({
@@ -102,9 +103,11 @@ export class CicdSimpleStack extends Stack {
         phases: {
           install: {
             commands: [
+              'curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -',
+              'sudo apt-get install -y nodejs',
               'npm install -g pnpm@9.6.0',
               'pnpm config set store-dir ~/.pnpm-store',
-              'pnpm install --frozen-lockfile',
+              'pnpm install --no-frozen-lockfile',
             ],
           },
           pre_build: {
