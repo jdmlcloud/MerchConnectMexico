@@ -1,9 +1,12 @@
 import { Stack, StackProps, CfnOutput, Tags } from 'aws-cdk-lib';
-import { HttpApi, CorsHttpMethod, CfnStage } from 'aws-cdk-lib/aws-apigatewayv2';
+import { HttpApi, CorsHttpMethod, CfnStage, CfnIntegration, CfnRoute } from 'aws-cdk-lib/aws-apigatewayv2';
 import { Construct } from 'constructs';
 import { Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Queue } from 'aws-cdk-lib/aws-sqs';
 import { IUserPool } from 'aws-cdk-lib/aws-cognito';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { Runtime } from 'aws-cdk-lib/aws-lambda';
+import { ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 
 interface ApiProps extends StackProps {
   stage: 'dev' | 'sbx' | 'prod';
@@ -20,10 +23,10 @@ export class ApiStack extends Stack {
     super(scope, id, props);
 
     const allowedOrigins = props.stage === 'dev'
-      ? ['https://dev.app.dominio.com']
+      ? ['https://dev.merchconnectmexico.com']
       : props.stage === 'sbx'
-      ? ['https://sbx.app.dominio.com']
-      : ['https://app.dominio.com'];
+      ? ['https://sbx.merchconnectmexico.com']
+      : ['https://merchconnectmexico.com'];
 
     const api = new HttpApi(this, 'HttpApi', {
       apiName: `mc-${props.stage}-api`,

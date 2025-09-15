@@ -40,29 +40,24 @@ export class AsyncStack extends Stack {
         platform: 'node',
         target: 'node20',
         externalModules: ['@aws-sdk/*'],
-        commandHooks: {
-          beforeBundling: (inputDir: string, outputDir: string): string[] => {
-            return [];
-          },
-          beforeInstall: (inputDir: string, outputDir: string): string[] => {
-            return [];
-          },
-          afterBundling: (inputDir: string, outputDir: string): string[] => {
-            return [];
-          },
-        },
       },
       environment: {
         STAGE: props.stage,
         AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       },
+      timeout: Duration.seconds(10),
+      memorySize: 256,
     });
     worker.addEventSource(new SqsEventSource(pagesQueue, { batchSize: 5 }));
 
-    // Allow putObject to public bucket mc-{stage}-public
+    // Allow putObject to public bucket mc-{stage}-public and invalidate CloudFront
     worker.addToRolePolicy(new PolicyStatement({
       actions: ['s3:PutObject', 's3:PutObjectAcl'],
       resources: [`arn:aws:s3:::mc-${props.stage}-public/*`],
+    }));
+    worker.addToRolePolicy(new PolicyStatement({
+      actions: ['cloudfront:CreateInvalidation'],
+      resources: ['*'],
     }));
 
     this.pagesQueue = pagesQueue;
