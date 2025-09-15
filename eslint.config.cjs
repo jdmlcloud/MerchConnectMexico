@@ -16,7 +16,7 @@ module.exports = {
   overrides: [
     {
       files: ['*.ts', '*.tsx'],
-      parserOptions: { project: './tsconfig.json' }
+      parserOptions: { tsconfigRootDir: __dirname }
     }
   ]
 }
