@@ -14,47 +14,66 @@ export class DataStack extends Stack {
 
   constructor(scope: Construct, id: string, props: StageProps) {
     super(scope, id, props);
+    // If USE_EXISTING_AWS=true is set in environment, import existing resources
+    const useExisting = process.env.USE_EXISTING_AWS === 'true';
 
-    const table = new Table(this, 'Table', {
-      tableName: `MerchConnect-${props.stage}`,
-      partitionKey: { name: 'pk', type: AttributeType.STRING },
-      sortKey: { name: 'sk', type: AttributeType.STRING },
-      billingMode: BillingMode.PAY_PER_REQUEST,
-      tableClass: TableClass.STANDARD,
-      pointInTimeRecovery: true,
-      removalPolicy: props.stage === 'prod' ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
-    });
-    table.addGlobalSecondaryIndex({
-      indexName: 'GSI1',
-      partitionKey: { name: 'gsi1pk', type: AttributeType.STRING },
-      sortKey: { name: 'gsi1sk', type: AttributeType.STRING },
-    });
-    Tags.of(table).add('Stage', props.stage);
+    if (useExisting) {
+      const existingTableName = `MerchConnect-${props.stage}`;
+      const assetsName = `mc-${props.stage}-assets-${this.account}`;
+      const publicName = `mc-${props.stage}-public-${this.account}`;
 
-    const assetsBucket = new Bucket(this, 'AssetsBucket', {
-      bucketName: `mc-${props.stage}-assets`,
-      versioned: true,
-      encryption: BucketEncryption.S3_MANAGED,
-      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-      enforceSSL: true,
-      removalPolicy: props.stage === 'prod' ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
-      autoDeleteObjects: props.stage === 'prod' ? false : true,
-    });
-    Tags.of(assetsBucket).add('Stage', props.stage);
+      const importedTable = Table.fromTableName(this, 'Table', existingTableName) as Table;
+      const importedAssets = Bucket.fromBucketName(this, 'AssetsBucket', assetsName);
+      const importedPublic = Bucket.fromBucketName(this, 'PublicBucket', publicName);
 
-    const publicBucket = new Bucket(this, 'PublicBucket', {
-      bucketName: `mc-${props.stage}-public`,
-      versioned: true,
-      encryption: BucketEncryption.S3_MANAGED,
-      blockPublicAccess: BlockPublicAccess.BLOCK_ACLS,
-      enforceSSL: true,
-      removalPolicy: props.stage === 'prod' ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
-      autoDeleteObjects: props.stage === 'prod' ? false : true,
-    });
-    Tags.of(publicBucket).add('Stage', props.stage);
+      this.table = importedTable as unknown as Table;
+      this.assetsBucket = importedAssets as unknown as Bucket;
+      this.publicBucket = importedPublic as unknown as Bucket;
+      Tags.of(this.table).add('Stage', props.stage);
+      Tags.of(this.assetsBucket).add('Stage', props.stage);
+      Tags.of(this.publicBucket).add('Stage', props.stage);
+    } else {
+      const table = new Table(this, 'Table', {
+        tableName: `MerchConnect-${props.stage}`,
+        partitionKey: { name: 'pk', type: AttributeType.STRING },
+        sortKey: { name: 'sk', type: AttributeType.STRING },
+        billingMode: BillingMode.PAY_PER_REQUEST,
+        tableClass: TableClass.STANDARD,
+        pointInTimeRecovery: true,
+        removalPolicy: props.stage === 'prod' ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
+      });
+      table.addGlobalSecondaryIndex({
+        indexName: 'GSI1',
+        partitionKey: { name: 'gsi1pk', type: AttributeType.STRING },
+        sortKey: { name: 'gsi1sk', type: AttributeType.STRING },
+      });
+      Tags.of(table).add('Stage', props.stage);
 
-    this.table = table;
-    this.assetsBucket = assetsBucket;
-    this.publicBucket = publicBucket;
+      const assetsBucket = new Bucket(this, 'AssetsBucket', {
+        bucketName: `mc-${props.stage}-assets`,
+        versioned: true,
+        encryption: BucketEncryption.S3_MANAGED,
+        blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+        enforceSSL: true,
+        removalPolicy: props.stage === 'prod' ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
+        autoDeleteObjects: props.stage === 'prod' ? false : true,
+      });
+      Tags.of(assetsBucket).add('Stage', props.stage);
+
+      const publicBucket = new Bucket(this, 'PublicBucket', {
+        bucketName: `mc-${props.stage}-public`,
+        versioned: true,
+        encryption: BucketEncryption.S3_MANAGED,
+        blockPublicAccess: BlockPublicAccess.BLOCK_ACLS,
+        enforceSSL: true,
+        removalPolicy: props.stage === 'prod' ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
+        autoDeleteObjects: props.stage === 'prod' ? false : true,
+      });
+      Tags.of(publicBucket).add('Stage', props.stage);
+
+      this.table = table;
+      this.assetsBucket = assetsBucket;
+      this.publicBucket = publicBucket;
+    }
   }
 }

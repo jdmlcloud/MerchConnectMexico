@@ -181,6 +181,24 @@ export class ApiStack extends Stack {
       resources: [billingWebhook.functionArn],
     }));
 
+    // Grant DynamoDB access to feature lambdas
+    const ddbTableArn = `arn:aws:dynamodb:${this.region}:${this.account}:table/MerchConnect-${props.stage}`;
+    const ddbPolicy = new PolicyStatement({
+      actions: [
+        'dynamodb:PutItem',
+        'dynamodb:Query',
+        'dynamodb:UpdateItem',
+        'dynamodb:DeleteItem',
+        'dynamodb:GetItem'
+      ],
+      resources: [ddbTableArn, `${ddbTableArn}/index/*`]
+    });
+
+    featuresCreate.addToRolePolicy(ddbPolicy);
+    featuresList.addToRolePolicy(ddbPolicy);
+    featuresUpdate.addToRolePolicy(ddbPolicy);
+    featuresDelete.addToRolePolicy(ddbPolicy);
+
     // Create JWT Authorizer using Cognito User Pool
     const issuer = `https://cognito-idp.${this.region}.amazonaws.com/${props.userPool.userPoolId}`;
     const authorizer = new CfnAuthorizer(this, 'CognitoJwtAuthorizer', {

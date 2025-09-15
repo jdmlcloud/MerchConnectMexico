@@ -9,12 +9,10 @@ module.exports = [
   {
     files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
-      parser: require.resolve('@typescript-eslint/parser'),
+      parser: require('@typescript-eslint/parser'),
       parserOptions: {
         ecmaVersion: 2020,
-        sourceType: 'module',
-        project: './tsconfig.json',
-        tsconfigRootDir: __dirname,
+        sourceType: 'module'
       },
     },
     plugins: {
