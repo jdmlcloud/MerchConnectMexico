@@ -18,9 +18,10 @@ export class DataStack extends Stack {
     const useExisting = process.env.USE_EXISTING_AWS === 'true';
 
     if (useExisting) {
-      const existingTableName = `MerchConnect-${props.stage}`;
-      const assetsName = `mc-${props.stage}-assets-${this.account}`;
-      const publicName = `mc-${props.stage}-public-${this.account}`;
+      // Prefer explicit env variables to import existing resources at synth time.
+      const existingTableName = process.env.EXISTING_TABLE_NAME || `MerchConnect-${props.stage}`;
+      const assetsName = process.env.EXISTING_ASSETS_BUCKET || `mc-${props.stage}-assets-${process.env.CDK_DEFAULT_ACCOUNT || ''}`;
+      const publicName = process.env.EXISTING_PUBLIC_BUCKET || `mc-${props.stage}-public-${process.env.CDK_DEFAULT_ACCOUNT || ''}`;
 
       const importedTable = Table.fromTableName(this, 'Table', existingTableName) as Table;
       const importedAssets = Bucket.fromBucketName(this, 'AssetsBucket', assetsName);
