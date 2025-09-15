@@ -1,0 +1,5 @@
+
+> @merchconnect/features@0.1.0 test /Volumes/Macintosh HD/MerchConnectMexico/packages/features
+> node -e "console.log('features ok')"
+
+features ok

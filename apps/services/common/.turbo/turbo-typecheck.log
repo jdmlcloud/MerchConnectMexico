@@ -1,0 +1,4 @@
+
+> @merchconnect/svc-common@0.1.0 typecheck /Volumes/Macintosh HD/MerchConnectMexico/apps/services/common
+> tsc -p tsconfig.json --noEmit
+
