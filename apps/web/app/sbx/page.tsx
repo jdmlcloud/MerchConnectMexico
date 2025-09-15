@@ -1,9 +1,9 @@
 "use client"
 
 import React, { useEffect, useState } from 'react'
-import { getEnvironmentInfo } from '../lib/config'
+import { getEnvironmentInfo } from '../../lib/config'
 
-export default function HomePage() {
+export default function SandboxPage() {
   const [envInfo, setEnvInfo] = useState<any>(null)
   const [isClient, setIsClient] = useState(false)
 
@@ -36,10 +36,10 @@ export default function HomePage() {
         width: '100%'
       }}>
         <h1 style={{ 
-          fontSize: '36px', 
+          fontSize: '32px', 
           marginBottom: '20px', 
           color: '#333',
-          background: 'linear-gradient(45deg, #8b5cf6, #7c3aed)',
+          background: 'linear-gradient(45deg, #f59e0b, #d97706)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent'
         }}>
@@ -47,7 +47,7 @@ export default function HomePage() {
         </h1>
         
         <div style={{
-          backgroundColor: '#8b5cf6',
+          backgroundColor: '#f59e0b',
           color: 'white',
           padding: '8px 16px',
           borderRadius: '20px',
@@ -56,16 +56,17 @@ export default function HomePage() {
           marginBottom: '30px',
           display: 'inline-block'
         }}>
-          SISTEMA MULTI-ENTORNO
+          ENTORNO DE SANDBOX
         </div>
 
         <div style={{ marginBottom: '30px' }}>
           <h2 style={{ fontSize: '24px', marginBottom: '15px', color: '#374151' }}>
-            Selecciona tu Entorno
+            Bienvenido al Entorno de Pruebas
           </h2>
           <p style={{ fontSize: '16px', color: '#6b7280', lineHeight: '1.6' }}>
-            MerchConnect México está disponible en múltiples entornos. 
-            Selecciona el entorno que necesitas para acceder a las funcionalidades correspondientes.
+            Este es el entorno de sandbox de MerchConnect México. 
+            Aquí puedes probar nuevas funcionalidades y realizar 
+            pruebas sin afectar el sistema de producción.
           </p>
         </div>
 
@@ -78,7 +79,7 @@ export default function HomePage() {
             textAlign: 'left'
           }}>
             <h3 style={{ fontSize: '18px', marginBottom: '15px', color: '#374151' }}>
-              Entorno Actual Detectado:
+              Configuración del Entorno:
             </h3>
             <div style={{ fontSize: '14px', color: '#6b7280' }}>
               <div><strong>Entorno:</strong> {envInfo.environment.toUpperCase()}</div>
@@ -91,43 +92,7 @@ export default function HomePage() {
 
         <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <a 
-            href="/prod" 
-            style={{
-              backgroundColor: '#10b981',
-              color: 'white',
-              padding: '12px 24px',
-              borderRadius: '6px',
-              textDecoration: 'none',
-              fontSize: '16px',
-              fontWeight: '500',
-              transition: 'background-color 0.2s'
-            }}
-            onMouseOver={(e) => e.target.style.backgroundColor = '#059669'}
-            onMouseOut={(e) => e.target.style.backgroundColor = '#10b981'}
-          >
-            🚀 Producción
-          </a>
-          
-          <a 
-            href="/sbx" 
-            style={{
-              backgroundColor: '#f59e0b',
-              color: 'white',
-              padding: '12px 24px',
-              borderRadius: '6px',
-              textDecoration: 'none',
-              fontSize: '16px',
-              fontWeight: '500',
-              transition: 'background-color 0.2s'
-            }}
-            onMouseOver={(e) => e.target.style.backgroundColor = '#d97706'}
-            onMouseOut={(e) => e.target.style.backgroundColor = '#f59e0b'}
-          >
-            🧪 Sandbox
-          </a>
-
-          <a 
-            href="/dev" 
+            href="/admin" 
             style={{
               backgroundColor: '#3b82f6',
               color: 'white',
@@ -141,19 +106,37 @@ export default function HomePage() {
             onMouseOver={(e) => e.target.style.backgroundColor = '#2563eb'}
             onMouseOut={(e) => e.target.style.backgroundColor = '#3b82f6'}
           >
-            💻 Desarrollo
+            Panel de Administración
+          </a>
+          
+          <a 
+            href="/workshop" 
+            style={{
+              backgroundColor: '#f59e0b',
+              color: 'white',
+              padding: '12px 24px',
+              borderRadius: '6px',
+              textDecoration: 'none',
+              fontSize: '16px',
+              fontWeight: '500',
+              transition: 'background-color 0.2s'
+            }}
+            onMouseOver={(e) => e.target.style.backgroundColor = '#d97706'}
+            onMouseOut={(e) => e.target.style.backgroundColor = '#f59e0b'}
+          >
+            Dashboard de Talleres
           </a>
         </div>
 
         <div style={{ 
           marginTop: '30px', 
           padding: '15px', 
-          backgroundColor: '#f3f4f6', 
+          backgroundColor: '#fef3c7', 
           borderRadius: '6px',
-          border: '1px solid #d1d5db'
+          border: '1px solid #f59e0b'
         }}>
-          <p style={{ fontSize: '14px', color: '#374151', margin: 0 }}>
-            ℹ️ <strong>Información:</strong> El entorno se detecta automáticamente basado en el dominio.
+          <p style={{ fontSize: '14px', color: '#92400e', margin: 0 }}>
+            🧪 <strong>Entorno de Sandbox:</strong> Perfecto para pruebas y desarrollo.
           </p>
         </div>
       </div>
