@@ -11,7 +11,7 @@
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -w -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "eslint -c ../../eslint.config.cjs --no-ignore ../../packages/storage/src/**/*.{ts,tsx}",
+    "lint": "eslint --no-ignore 'src/**/*.{ts,tsx}'",
     "test": "node -e \"console.log('storage ok')\""
   },
   "dependencies": {
