@@ -1,0 +1,5 @@
+
+> @merchconnect/auth@0.1.0 test /Volumes/Macintosh HD/MerchConnectMexico/packages/auth
+> node -e "console.log('auth ok')"
+
+auth ok

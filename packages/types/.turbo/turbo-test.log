@@ -1,0 +1,5 @@
+
+> @merchconnect/types@0.1.0 test /Volumes/Macintosh HD/MerchConnectMexico/packages/types
+> node -e "console.log('types ok')"
+
+types ok

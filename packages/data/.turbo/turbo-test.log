@@ -1,0 +1,5 @@
+
+> @merchconnect/data@0.1.0 test /Volumes/Macintosh HD/MerchConnectMexico/packages/data
+> node -e "console.log('data ok')"
+
+data ok
