@@ -78,6 +78,38 @@ export class ApiStack extends Stack {
       environment: { STAGE: props.stage },
     });
 
+    const featuresCreate = new NodejsFunction(this, 'FeaturesCreateFn', {
+      functionName: `mc-${props.stage}-features-create`,
+      runtime: Runtime.NODEJS_20_X,
+      entry: '../../apps/services/features/src/handlers.ts',
+      handler: 'createOverride',
+      environment: { STAGE: props.stage },
+    });
+
+    const featuresList = new NodejsFunction(this, 'FeaturesListFn', {
+      functionName: `mc-${props.stage}-features-list`,
+      runtime: Runtime.NODEJS_20_X,
+      entry: '../../apps/services/features/src/handlers.ts',
+      handler: 'listOverrides',
+      environment: { STAGE: props.stage },
+    });
+
+    const featuresUpdate = new NodejsFunction(this, 'FeaturesUpdateFn', {
+      functionName: `mc-${props.stage}-features-update`,
+      runtime: Runtime.NODEJS_20_X,
+      entry: '../../apps/services/features/src/handlers.ts',
+      handler: 'updateOverride',
+      environment: { STAGE: props.stage },
+    });
+
+    const featuresDelete = new NodejsFunction(this, 'FeaturesDeleteFn', {
+      functionName: `mc-${props.stage}-features-delete`,
+      runtime: Runtime.NODEJS_20_X,
+      entry: '../../apps/services/features/src/handlers.ts',
+      handler: 'deleteOverride',
+      environment: { STAGE: props.stage },
+    });
+
     // Create integrations
     const region = Fn.select(3, Fn.split(':', this.account ? this.stackId : '')) || (this.region || 'us-east-1');
     const makeIntegrationUri = (fnArn: string) => `arn:aws:apigateway:${this.region}:lambda:path/2015-03-31/functions/${fnArn}/invocations`;
@@ -103,11 +135,43 @@ export class ApiStack extends Stack {
       payloadFormatVersion: '2.0',
     });
 
+    const featuresCreateIntegration = new CfnIntegration(this, 'FeaturesCreateIntegration', {
+      apiId: api.apiId,
+      integrationType: 'AWS_PROXY',
+      integrationUri: makeIntegrationUri(featuresCreate.functionArn),
+      payloadFormatVersion: '2.0',
+    });
+
+    const featuresListIntegration = new CfnIntegration(this, 'FeaturesListIntegration', {
+      apiId: api.apiId,
+      integrationType: 'AWS_PROXY',
+      integrationUri: makeIntegrationUri(featuresList.functionArn),
+      payloadFormatVersion: '2.0',
+    });
+
+    const featuresUpdateIntegration = new CfnIntegration(this, 'FeaturesUpdateIntegration', {
+      apiId: api.apiId,
+      integrationType: 'AWS_PROXY',
+      integrationUri: makeIntegrationUri(featuresUpdate.functionArn),
+      payloadFormatVersion: '2.0',
+    });
+
+    const featuresDeleteIntegration = new CfnIntegration(this, 'FeaturesDeleteIntegration', {
+      apiId: api.apiId,
+      integrationType: 'AWS_PROXY',
+      integrationUri: makeIntegrationUri(featuresDelete.functionArn),
+      payloadFormatVersion: '2.0',
+    });
+
     // Allow API Gateway to invoke Lambdas
     orgsCreate.addToRolePolicy(new PolicyStatement({
       actions: ['lambda:InvokeFunction'],
       resources: [orgsCreate.functionArn],
     }));
+    featuresCreate.addToRolePolicy(new PolicyStatement({ actions: ['lambda:InvokeFunction'], resources: [featuresCreate.functionArn] }));
+    featuresList.addToRolePolicy(new PolicyStatement({ actions: ['lambda:InvokeFunction'], resources: [featuresList.functionArn] }));
+    featuresUpdate.addToRolePolicy(new PolicyStatement({ actions: ['lambda:InvokeFunction'], resources: [featuresUpdate.functionArn] }));
+    featuresDelete.addToRolePolicy(new PolicyStatement({ actions: ['lambda:InvokeFunction'], resources: [featuresDelete.functionArn] }));
     orgsList.addToRolePolicy(new PolicyStatement({
       actions: ['lambda:InvokeFunction'],
       resources: [orgsList.functionArn],
@@ -149,6 +213,38 @@ export class ApiStack extends Stack {
       routeKey: 'POST /api/v1/payments/mercadopago/webhook',
       target: `integrations/${billingIntegration.ref}`,
       authorizationType: 'NONE',
+    });
+
+    new CfnRoute(this, 'FeaturesCreateRoute', {
+      apiId: api.apiId,
+      routeKey: 'POST /api/v1/features/overrides',
+      target: `integrations/${featuresCreateIntegration.ref}`,
+      authorizationType: 'JWT',
+      authorizerId: authorizer.ref,
+    });
+
+    new CfnRoute(this, 'FeaturesListRoute', {
+      apiId: api.apiId,
+      routeKey: 'GET /api/v1/features/overrides/{orgId}',
+      target: `integrations/${featuresListIntegration.ref}`,
+      authorizationType: 'JWT',
+      authorizerId: authorizer.ref,
+    });
+
+    new CfnRoute(this, 'FeaturesUpdateRoute', {
+      apiId: api.apiId,
+      routeKey: 'PUT /api/v1/features/overrides/{orgId}/{overrideId}',
+      target: `integrations/${featuresUpdateIntegration.ref}`,
+      authorizationType: 'JWT',
+      authorizerId: authorizer.ref,
+    });
+
+    new CfnRoute(this, 'FeaturesDeleteRoute', {
+      apiId: api.apiId,
+      routeKey: 'DELETE /api/v1/features/overrides/{orgId}/{overrideId}',
+      target: `integrations/${featuresDeleteIntegration.ref}`,
+      authorizationType: 'JWT',
+      authorizerId: authorizer.ref,
     });
   }
 }
